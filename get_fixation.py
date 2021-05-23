@@ -13,6 +13,7 @@ if __name__ == "__main__":
     #specify dataset & video name to extract
     TOPIC = sys.argv[2]#for 6, modify 2 places, for loop vlength, and output file with _part
     DELTA = 0.06
+	#DELTA = 0.06
     
     dataset = int(sys.argv[1])#saldat_head_orientation.HeadOrientation._DATASET2
     topic = TOPIC#dataset 1: paris, roller, venise,diving,timelapse, 
@@ -23,7 +24,7 @@ if __name__ == "__main__":
     #initialize head_oren
     print ("generating saliency maps for ds={}, topic={}".format(dataset, TOPIC))
     dirpath1 = header.dirpath1#u'./data/head-orientation/dataset1'
-    dirpath2 = header.dirpath2#u'./data/head-orientation/dataset2/Experiment_1'
+    dirpath2 = header.dirpath2#u'./data/head-orientation/dataset2/Experiment_1/foin7'
     dirpath3 = header.dirpath3#u'./data/head-orientation/dataset3/sensory/orientation'
     ext1 = header.ext1
     ext2 = header.ext2
@@ -31,13 +32,15 @@ if __name__ == "__main__":
     headoren = saldat_head_orientation.HeadOrientation(dirpath1, dirpath2, dirpath3, ext1, ext2, ext3)
     #initialize 
     var = 20
+    #var = 20
     salsal = saldat_saliency.Fixation(var)
     
     dirpath, filename_list, f_parse, f_extract_direction = headoren.load_filename_list(dataset, topic)
+    
     series_ds = headoren.load_series_ds(filename_list, f_parse)
     vector_ds = headoren.headpos_to_headvec(series_ds, f_extract_direction)
     vector_ds = headoren.cutoff_vel_acc(vector_ds, dataset=dataset)
-
+    
     _, vlength, _, _ = head_orientation_lib.topic_info_dict[topic]
     saliency_ds = []
     for t in np.arange(1, vlength, DELTA):#0.06
@@ -49,7 +52,8 @@ if __name__ == "__main__":
             print (t, len(fixation_list))
             fmap0 = headoren.create_fixation_map(fixation_list, dataset)
             heat_map0 = salsal.create_saliency(fixation_list, dataset)
-            saliency_ds.append([t, v_list, heat_map0])
+            saliency_ds.append([t, v_list, heat_map0, len(fixation_list)])
+            #print (v_list)
         
         except:
             continue
